@@ -13,9 +13,9 @@ const services = [
 ];
 
 const jobs = [
-  { id: 1, title: "Deep Kitchen Cleaning", worker: "Maya Chen", initial: "M", color: "#22c55e", status: "In Progress", budget: "$45", date: "Today, 2:00 PM" },
-  { id: 2, title: "IKEA Furniture Assembly", worker: "James Obi", initial: "J", color: "#3b82f6", status: "Confirmed", budget: "$60", date: "Tomorrow, 10:00 AM" },
-  { id: 3, title: "Grocery Delivery", worker: "Sara Nkomo", initial: "S", color: "#a855f7", status: "Confirmed", budget: "$25", date: "Today, 5:00 PM" },
+  { id: 1, title: "Deep Kitchen Cleaning", worker: "Maya Chen", initial: "M", color: "#22c55e", status: "In Progress", budget: "2500FCFA", date: "Today, 2:00 PM" },
+  { id: 2, title: "IKEA Furniture Assembly", worker: "James Obi", initial: "J", color: "#3b82f6", status: "Confirmed", budget: "600FCFA", date: "Tomorrow, 10:00 AM" },
+  { id: 3, title: "Grocery Delivery", worker: "Sara Nkomo", initial: "S", color: "#a855f7", status: "Confirmed", budget: "25600FCFA", date: "Today, 5:00 PM" },
 ];
 
 const workers = [
@@ -143,7 +143,7 @@ export default function ClientDashboard() {
               </div>
 
               <div className={styles.statsRow}>
-                {[["3", "Active", "#0f2d52"], ["12", "Done", "#14532d"], ["$240", "Spent", "#4c1d95"]].map(([n, l, bg]) => (
+                {[["3", "Active", "#0f2d52"], ["12", "Done", "#14532d"], ["2400FCFA", "Spent", "#4c1d95"]].map(([n, l, bg]) => (
                   <div key={l} className={styles.statBox} style={{ background: bg }}>
                     <span className={styles.statNum}>{n}</span>
                     <span className={styles.statLabel}>{l}</span>
