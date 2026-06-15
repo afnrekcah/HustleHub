@@ -1,0 +1,1038 @@
+"use client";
+
+import { useState } from "react";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+type Job = {
+  id: number;
+  title: string;
+  location: string;
+  distance: string;
+  price: number;
+  priceType: string;
+  tags: string[];
+  category: string;
+  urgent: boolean;
+  accepted: boolean;
+};
+
+type UpcomingJob = {
+  id: number;
+  time: string;
+  day: string;
+  color: string;
+  title: string;
+  address: string;
+  icon: string;
+};
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const ALL_JOBS: Job[] = [
+  {
+    id: 1,
+    title: "Compound Sweeping & Weeding",
+    location: "Mile 17, Buea",
+    distance: "1.2 km away",
+    price: 4500,
+    priceType: "Fixed Price",
+    tags: ["Gardening", "2–3 Hours"],
+    category: "Garden",
+    urgent: false,
+    accepted: false,
+  },
+  {
+    id: 2,
+    title: "Wardrobe Assembly (IKENGA)",
+    location: "Molyko, Buea",
+    distance: "2.8 km away",
+    price: 7000,
+    priceType: "Estimated",
+    tags: ["Handyman", "Tools Provided"],
+    category: "Repairs",
+    urgent: false,
+    accepted: false,
+  },
+  {
+    id: 3,
+    title: "Grocery Delivery & Fridge Setup",
+    location: "Great Soppo, Buea",
+    distance: "0.9 km away",
+    price: 2500,
+    priceType: "Base Rate",
+    tags: ["Delivery", "Urgent"],
+    category: "Delivery",
+    urgent: true,
+    accepted: false,
+  },
+  {
+    id: 4,
+    title: "UB Campus Room Cleaning",
+    location: "University of Buea",
+    distance: "1.5 km away",
+    price: 3000,
+    priceType: "Fixed Price",
+    tags: ["Cleaning", "1–2 Hours"],
+    category: "Cleaning",
+    urgent: false,
+    accepted: false,
+  },
+  {
+    id: 5,
+    title: "Maths & Physics Home Tutoring",
+    location: "Bonduma, Buea",
+    distance: "3.1 km away",
+    price: 5000,
+    priceType: "Per Session",
+    tags: ["Tutoring", "2 Hours"],
+    category: "Tutoring",
+    urgent: false,
+    accepted: false,
+  },
+  {
+    id: 6,
+    title: "Plumbing Repair – Burst Pipe",
+    location: "Clerks Quarter, Buea",
+    distance: "2.0 km away",
+    price: 8500,
+    priceType: "Estimated",
+    tags: ["Plumbing", "Urgent"],
+    category: "Repairs",
+    urgent: true,
+    accepted: false,
+  },
+];
+
+const UPCOMING: UpcomingJob[] = [
+  {
+    id: 1,
+    day: "Tomorrow",
+    time: "9:00 AM",
+    color: "#006C49",
+    title: "Patio Pressure Washing",
+    address: "Commercial Avenue, Buea Town",
+    icon: "🚿",
+  },
+  {
+    id: 2,
+    day: "Wed",
+    time: "2:00 PM",
+    color: "#00236F",
+    title: "Dog Walking (Bobo)",
+    address: "Bokwango Road, Buea",
+    icon: "🐕",
+  },
+  {
+    id: 3,
+    day: "Fri",
+    time: "10:30 AM",
+    color: "#D97706",
+    title: "Office Deep Cleaning",
+    address: "Down Beach, Limbe Rd",
+    icon: "🧹",
+  },
+];
+
+const CATEGORIES = ["All", "Cleaning", "Delivery", "Repairs", "Garden", "Tutoring"];
+
+const formatFCFA = (n: number) =>
+  n.toLocaleString("fr-CM") + " FCFA";
+
+// ─── Job Detail Modal ──────────────────────────────────────────────────────────
+function JobModal({
+  job,
+  onClose,
+  onAccept,
+}: {
+  job: Job;
+  onClose: () => void;
+  onAccept: (id: number) => void;
+}) {
+  const [accepting, setAccepting] = useState(false);
+
+  const handleAccept = () => {
+    setAccepting(true);
+    setTimeout(() => {
+      onAccept(job.id);
+      onClose();
+    }, 1200);
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "#00000066",
+        zIndex: 200,
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "center",
+        animation: "fadeIn 0.2s ease",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#fff",
+          borderRadius: "24px 24px 0 0",
+          padding: "28px 24px 40px",
+          width: "100%",
+          maxWidth: 540,
+          animation: "slideUp 0.3s ease",
+          boxShadow: "0 -8px 40px #00000022",
+        }}
+      >
+        {/* Handle */}
+        <div style={{ width: 44, height: 4, background: "#E2E7FF", borderRadius: 4, margin: "0 auto 20px" }} />
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+          <div style={{ flex: 1 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: "#131B2E", marginBottom: 6 }}>{job.title}</h2>
+            <p style={{ color: "#444651", fontSize: 13 }}>📍 {job.location} · {job.distance}</p>
+          </div>
+          <div style={{ textAlign: "right", marginLeft: 12 }}>
+            <p style={{ fontWeight: 800, fontSize: 20, color: "#006C49" }}>{formatFCFA(job.price)}</p>
+            <p style={{ color: "#757682", fontSize: 11 }}>{job.priceType}</p>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+          {job.tags.map((t) => (
+            <span key={t} style={{ background: "#EAEDFF", color: "#444651", padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
+              {t}
+            </span>
+          ))}
+          {job.urgent && (
+            <span style={{ background: "#FFE4E4", color: "#BA1A1A", padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+              🔴 URGENT
+            </span>
+          )}
+        </div>
+
+        <div style={{ background: "#F2F3FF", borderRadius: 14, padding: 16, marginBottom: 20 }}>
+          <p style={{ fontWeight: 700, color: "#00236F", fontSize: 13, marginBottom: 8 }}>📋 Job Details</p>
+          <p style={{ color: "#444651", fontSize: 13, lineHeight: 1.7 }}>
+            Client needs help with <strong>{job.title.toLowerCase()}</strong> in {job.location}. Payment via Mobile Money upon completion. This job is in the <strong>{job.category}</strong> category.
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+          {[
+            { label: "💰 Payment", value: formatFCFA(job.price) },
+            { label: "📍 Distance", value: job.distance },
+            { label: "⏱ Est. Duration", value: job.tags.find((t) => t.includes("Hour")) || "Flexible" },
+            { label: "💳 Pay Type", value: job.priceType },
+          ].map((item) => (
+            <div key={item.label} style={{ background: "#FAFAFA", borderRadius: 12, padding: "12px 14px", border: "1px solid #DAE2FD" }}>
+              <p style={{ fontSize: 11, color: "#757682", marginBottom: 3 }}>{item.label}</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#131B2E" }}>{item.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={handleAccept}
+          disabled={accepting}
+          style={{
+            width: "100%",
+            padding: "15px",
+            background: accepting ? "#006C49" : "linear-gradient(135deg, #00236F, #264191)",
+            color: "#fff",
+            border: "none",
+            borderRadius: 14,
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: accepting ? "not-allowed" : "pointer",
+            transition: "all 0.3s ease",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+          }}
+        >
+          {accepting ? "✅ Job Accepted! Notifying client..." : "Accept This Job →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ────────────────────────────────────────────────────────────
+export default function WorkerDashboard() {
+  const [activeNav, setActiveNav] = useState("Home");
+  const [jobs, setJobs] = useState<Job[]>(ALL_JOBS);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isOnline, setIsOnline] = useState(true);
+  const [hasNotif, setHasNotif] = useState(true);
+  const [earnings] = useState(124500);
+  const [weeklyEarnings] = useState([45000, 62000, 38000, 91000, 57000, 110000, 124500]);
+  const [completedJobs, setCompletedJobs] = useState(14);
+  const [showEarningsDetail, setShowEarningsDetail] = useState(false);
+  const [upcomingJobs, setUpcomingJobs] = useState(UPCOMING);
+
+  const maxBar = Math.max(...weeklyEarnings);
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  const filteredJobs =
+    activeCategory === "All"
+      ? jobs
+      : jobs.filter((j) => j.category === activeCategory);
+
+  const handleAccept = (id: number) => {
+    setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, accepted: true } : j)));
+    setCompletedJobs((n) => n + 1);
+  };
+
+  const dismissUpcoming = (id: number) => {
+    setUpcomingJobs((prev) => prev.filter((u) => u.id !== id));
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#F7F8FC",
+        fontFamily: "'Sora', 'Segoe UI', sans-serif",
+        color: "#131B2E",
+        paddingBottom: 100,
+      }}
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeUp 0.45s ease both; }
+        .s1 { animation-delay: 0.05s; }
+        .s2 { animation-delay: 0.10s; }
+        .s3 { animation-delay: 0.15s; }
+        .s4 { animation-delay: 0.20s; }
+
+        .job-card { transition: all 0.25s ease; cursor: pointer; }
+        .job-card:hover { transform: translateY(-4px); box-shadow: 0 10px 28px #00236f18 !important; }
+        .job-card:active { transform: scale(0.98); }
+
+        .cat-btn { transition: all 0.2s ease; cursor: pointer; border: none; }
+        .cat-btn:hover { background: #00236F !important; color: #fff !important; }
+
+        .nav-item { transition: all 0.2s ease; cursor: pointer; background: none; border: none; }
+        .nav-item:hover { color: #00236F !important; }
+
+        .upcoming-card { transition: all 0.25s ease; }
+        .upcoming-card:hover { transform: translateX(4px); }
+
+        .toggle-track { transition: background 0.3s ease; }
+        .toggle-thumb { transition: transform 0.3s ease; }
+
+        .bar { transition: height 0.5s ease; }
+
+        .fab { transition: transform 0.2s ease; }
+        .fab:hover { transform: scale(1.08); }
+
+        .earnings-card { transition: all 0.2s ease; cursor: pointer; }
+        .earnings-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px #00236f25 !important; }
+
+        .dismiss-btn { transition: opacity 0.2s ease; cursor: pointer; background: none; border: none; }
+        .dismiss-btn:hover { opacity: 0.7; }
+      `}</style>
+
+      {/* ── HEADER ─────────────────────────────────────────────────────────── */}
+      <header
+        style={{
+          background: "#fff",
+          boxShadow: "0 1px 6px #0000000d",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 20px",
+          height: 64,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 22, cursor: "pointer", color: "#00236F" }}>☰</span>
+          <span style={{ fontWeight: 800, fontSize: 20, color: "#00236F" }}>HustleHub</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <span
+            style={{
+              display: "none",
+              fontSize: 13,
+              fontWeight: 600,
+              color: "#444651",
+            }}
+          />
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#444651", display: "block" }}>
+            Mbote, Tabi 👋
+          </span>
+
+          {/* Online toggle */}
+          <div
+            onClick={() => setIsOnline((v) => !v)}
+            style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}
+          >
+            <div
+              className="toggle-track"
+              style={{
+                width: 40,
+                height: 22,
+                borderRadius: 11,
+                background: isOnline ? "#006C49" : "#C5C5D3",
+                position: "relative",
+                padding: "2px",
+              }}
+            >
+              <div
+                className="toggle-thumb"
+                style={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  background: "#fff",
+                  transform: isOnline ? "translateX(18px)" : "translateX(0)",
+                  boxShadow: "0 1px 4px #0002",
+                }}
+              />
+            </div>
+            <span style={{ fontSize: 12, fontWeight: 700, color: isOnline ? "#006C49" : "#757682" }}>
+              {isOnline ? "Online" : "Offline"}
+            </span>
+          </div>
+
+          {/* Notification bell */}
+          <div
+            onClick={() => setHasNotif(false)}
+            style={{ position: "relative", cursor: "pointer" }}
+          >
+            <span style={{ fontSize: 20, color: "#444651" }}>🔔</span>
+            {hasNotif && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: -2,
+                  right: -2,
+                  width: 9,
+                  height: 9,
+                  background: "#BA1A1A",
+                  borderRadius: "50%",
+                  border: "2px solid #fff",
+                }}
+              />
+            )}
+          </div>
+
+          {/* Avatar */}
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #00236F, #264191)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 17,
+              border: "2px solid #DAE2FD",
+            }}
+          >
+            🧑🏿
+          </div>
+        </div>
+      </header>
+
+      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 20px" }}>
+
+        {/* ── STATUS CARDS ─────────────────────────────────────────────────── */}
+        <section className="fade-in" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 36 }}>
+
+          {/* Earnings */}
+          <div
+            className="earnings-card"
+            onClick={() => setShowEarningsDetail((v) => !v)}
+            style={{
+              background: "linear-gradient(135deg, #1E3A8A, #00236F)",
+              borderRadius: 18,
+              padding: 22,
+              boxShadow: "0 6px 24px #00236f33",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <p style={{ color: "#90A8FF", fontSize: 12, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  This Month's Earnings
+                </p>
+                <h2 style={{ color: "#fff", fontSize: 26, fontWeight: 800, letterSpacing: "-0.02em" }}>
+                  {formatFCFA(earnings)}
+                </h2>
+              </div>
+              <div
+                style={{
+                  background: "#ffffff22",
+                  borderRadius: 12,
+                  width: 46,
+                  height: 46,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 22,
+                }}
+              >
+                💰
+              </div>
+            </div>
+            <p style={{ color: "#90A8FF", fontSize: 12 }}>
+              📈 +18% from last month · Tap for breakdown
+            </p>
+
+            {/* Weekly bar chart (expandable) */}
+            {showEarningsDetail && (
+              <div
+                style={{
+                  marginTop: 12,
+                  borderTop: "1px solid #ffffff22",
+                  paddingTop: 14,
+                  animation: "slideUp 0.3s ease",
+                }}
+              >
+                <p style={{ color: "#90A8FF", fontSize: 11, marginBottom: 10, fontWeight: 600 }}>
+                  Weekly Breakdown
+                </p>
+                <div style={{ display: "flex", gap: 6, alignItems: "flex-end", height: 50 }}>
+                  {weeklyEarnings.map((val, i) => (
+                    <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                      <div
+                        className="bar"
+                        style={{
+                          width: "100%",
+                          height: `${(val / maxBar) * 44}px`,
+                          background: i === 6 ? "#6CF8BB" : "#ffffff44",
+                          borderRadius: 4,
+                        }}
+                      />
+                      <span style={{ color: "#90A8FF", fontSize: 9 }}>{days[i]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Trust Score */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #F0FDF9, #CCFBF1)",
+              borderRadius: 18,
+              padding: 22,
+              boxShadow: "0 4px 16px #006c4922",
+              border: "1px solid #6CF8BB66",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <p style={{ color: "#005236", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>
+                Trust Score
+              </p>
+              <h2 style={{ color: "#00714D", fontSize: 36, fontWeight: 800 }}>98</h2>
+              <div style={{ display: "flex", gap: 4, marginTop: 6 }}>
+                {"★★★★★".split("").map((s, i) => (
+                  <span key={i} style={{ color: "#F59E0B", fontSize: 14 }}>{s}</span>
+                ))}
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <span
+                style={{
+                  background: "#00714D",
+                  color: "#fff",
+                  padding: "5px 12px",
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                🏆 TOP RATED
+              </span>
+              <p style={{ color: "#006C49", fontSize: 12, fontWeight: 600 }}>{completedJobs} jobs done</p>
+            </div>
+          </div>
+
+          {/* Online status card */}
+          <div
+            style={{
+              background: isOnline ? "linear-gradient(135deg, #F0FFF4, #D1FAE5)" : "#F1F5F9",
+              borderRadius: 18,
+              padding: 22,
+              border: `1px solid ${isOnline ? "#6EE7B7" : "#E2E7FF"}`,
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <p style={{ color: isOnline ? "#065F46" : "#757682", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                Availability
+              </p>
+              <span style={{ fontSize: 20 }}>{isOnline ? "🟢" : "⚫"}</span>
+            </div>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: isOnline ? "#065F46" : "#444651" }}>
+              {isOnline ? "You're Live!" : "You're Offline"}
+            </h3>
+            <p style={{ fontSize: 12, color: isOnline ? "#059669" : "#94A3B8" }}>
+              {isOnline
+                ? "Clients in Buea can see your profile and send requests."
+                : "Toggle online to start receiving job requests."}
+            </p>
+          </div>
+        </section>
+
+        {/* ── MAIN GRID ─────────────────────────────────────────────────────── */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: 28,
+          }}
+        >
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 300px", gap: 28 }}
+            className="main-grid"
+          >
+            {/* ── Available Jobs ── */}
+            <div className="fade-in s1">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h3 style={{ fontSize: 20, fontWeight: 700 }}>Available Jobs in Buea</h3>
+                <span style={{ color: "#757682", fontSize: 13 }}>{filteredJobs.filter(j => !j.accepted).length} open</span>
+              </div>
+
+              {/* Category filter */}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 18 }}>
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    className="cat-btn"
+                    onClick={() => setActiveCategory(cat)}
+                    style={{
+                      padding: "7px 16px",
+                      borderRadius: 20,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      background: activeCategory === cat ? "#00236F" : "#E2E7FF",
+                      color: activeCategory === cat ? "#fff" : "#444651",
+                    }}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Job cards */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {filteredJobs.map((job) => (
+                  <div
+                    key={job.id}
+                    className="job-card"
+                    onClick={() => !job.accepted && setSelectedJob(job)}
+                    style={{
+                      background: job.accepted ? "#F0FDF9" : "#fff",
+                      borderRadius: 16,
+                      padding: 18,
+                      boxShadow: "0 2px 10px #0000000a",
+                      border: job.accepted
+                        ? "1.5px solid #6EE7B7"
+                        : job.urgent
+                        ? "1.5px solid #FCA5A5"
+                        : "1px solid #DAE2FD",
+                      opacity: job.accepted ? 0.85 : 1,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                          <h4 style={{ fontSize: 16, fontWeight: 700, color: "#131B2E" }}>{job.title}</h4>
+                          {job.urgent && (
+                            <span style={{ background: "#FFE4E4", color: "#BA1A1A", fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 10 }}>
+                              URGENT
+                            </span>
+                          )}
+                          {job.accepted && (
+                            <span style={{ background: "#D1FAE5", color: "#065F46", fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 10 }}>
+                              ✓ ACCEPTED
+                            </span>
+                          )}
+                        </div>
+                        <p style={{ color: "#757682", fontSize: 13 }}>
+                          📍 {job.distance} · {job.location}
+                        </p>
+                      </div>
+                      <div style={{ textAlign: "right", marginLeft: 12 }}>
+                        <p style={{ fontWeight: 800, fontSize: 17, color: "#006C49" }}>
+                          {formatFCFA(job.price)}
+                        </p>
+                        <p style={{ color: "#94A3B8", fontSize: 11 }}>{job.priceType}</p>
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+                      {job.tags.map((t) => (
+                        <span
+                          key={t}
+                          style={{
+                            background: "#EAEDFF",
+                            color: "#444651",
+                            padding: "4px 10px",
+                            borderRadius: 20,
+                            fontSize: 11,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    {!job.accepted && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedJob(job); }}
+                        style={{
+                          width: "100%",
+                          padding: "11px",
+                          background: job.urgent
+                            ? "linear-gradient(135deg, #BA1A1A, #991B1B)"
+                            : "linear-gradient(135deg, #00236F, #264191)",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 12,
+                          fontSize: 13,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 6,
+                        }}
+                      >
+                        {job.urgent ? "⚡ View Urgent Job →" : "View Details →"}
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                {filteredJobs.length === 0 && (
+                  <div style={{ textAlign: "center", padding: "40px 20px", color: "#94A3B8" }}>
+                    <p style={{ fontSize: 32, marginBottom: 8 }}>🔍</p>
+                    <p style={{ fontSize: 14 }}>No jobs in this category right now.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── RIGHT SIDEBAR ── */}
+            <div className="fade-in s2" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+              {/* Upcoming Jobs */}
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>Upcoming Jobs</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {upcomingJobs.length === 0 && (
+                    <p style={{ color: "#94A3B8", fontSize: 13, textAlign: "center", padding: "20px 0" }}>
+                      No upcoming jobs scheduled.
+                    </p>
+                  )}
+                  {upcomingJobs.map((u) => (
+                    <div
+                      key={u.id}
+                      className="upcoming-card"
+                      style={{
+                        background: "#fff",
+                        borderRadius: 14,
+                        padding: "14px 16px",
+                        borderLeft: `4px solid ${u.color}`,
+                        boxShadow: "0 1px 6px #0000000a",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        gap: 10,
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                          <span style={{ fontSize: 10, fontWeight: 800, color: u.color, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            {u.day}, {u.time}
+                          </span>
+                          <span style={{ fontSize: 16 }}>📅</span>
+                        </div>
+                        <p style={{ fontWeight: 700, color: "#131B2E", fontSize: 13, marginBottom: 2 }}>
+                          {u.icon} {u.title}
+                        </p>
+                        <p style={{ color: "#757682", fontSize: 11 }}>{u.address}</p>
+                      </div>
+                      <button
+                        className="dismiss-btn"
+                        onClick={() => dismissUpcoming(u.id)}
+                        style={{ color: "#C5C5D3", fontSize: 16, marginTop: -2 }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Map placeholder */}
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>Job Activity Map</h3>
+                <div
+                  style={{
+                    background: "linear-gradient(135deg, #DAE2FD, #E2E7FF)",
+                    borderRadius: 16,
+                    height: 180,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid #C5C5D3",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Fake map dots */}
+                  {[
+                    { top: "30%", left: "25%" },
+                    { top: "55%", left: "60%" },
+                    { top: "20%", left: "70%" },
+                    { top: "70%", left: "35%" },
+                  ].map((pos, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        position: "absolute",
+                        top: pos.top,
+                        left: pos.left,
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        background: "#00236F",
+                        border: "2px solid #fff",
+                        boxShadow: "0 0 0 4px #00236f33",
+                      }}
+                    />
+                  ))}
+                  <div
+                    style={{
+                      background: "#fff",
+                      borderRadius: 20,
+                      padding: "8px 16px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      boxShadow: "0 2px 10px #00000018",
+                      zIndex: 1,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        background: "#006C49",
+                        display: "inline-block",
+                        boxShadow: "0 0 0 4px #006c4933",
+                        animation: "pulse 1.5s infinite",
+                      }}
+                    />
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#00236F" }}>
+                      Buea · Map View Active
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 11, color: "#444651", marginTop: 8, zIndex: 1 }}>
+                    📍 Showing {filteredJobs.length} jobs near you
+                  </p>
+                </div>
+              </div>
+
+              {/* Quick stats */}
+              <div
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  padding: 18,
+                  border: "1px solid #DAE2FD",
+                  boxShadow: "0 1px 6px #0000000a",
+                }}
+              >
+                <p style={{ fontWeight: 700, fontSize: 15, marginBottom: 14 }}>Your Stats</p>
+                {[
+                  { label: "Jobs Accepted", value: completedJobs, icon: "✅" },
+                  { label: "Response Rate", value: "97%", icon: "⚡" },
+                  { label: "Repeat Clients", value: "8", icon: "🔁" },
+                  { label: "Avg. Rating", value: "4.9 ★", icon: "⭐" },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "8px 0",
+                      borderBottom: "1px solid #F1F5F9",
+                    }}
+                  >
+                    <span style={{ fontSize: 13, color: "#444651" }}>
+                      {stat.icon} {stat.label}
+                    </span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "#00236F" }}>{stat.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* ── FOOTER ─────────────────────────────────────────────────────────── */}
+      <footer
+        style={{
+          background: "#fff",
+          borderTop: "1px solid #DAE2FD",
+          padding: "28px 20px",
+          marginTop: 48,
+          marginBottom: 80,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
+          <div>
+            <p style={{ fontWeight: 800, fontSize: 17, color: "#00236F" }}>HustleHub</p>
+            <p style={{ color: "#757682", fontSize: 12, marginTop: 2 }}>
+              © 2026 HustleHub Marketplace. Supporting student ambition.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
+            {["Terms of Service", "Privacy Policy", "Support"].map((t) => (
+              <a
+                key={t}
+                href="#"
+                style={{ color: "#444651", fontSize: 13, textDecoration: "none" }}
+              >
+                {t}
+              </a>
+            ))}
+          </div>
+        </div>
+      </footer>
+
+      {/* ── BOTTOM NAV ─────────────────────────────────────────────────────── */}
+      <nav
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          width: "100%",
+          height: 76,
+          background: "#fff",
+          borderTop: "1px solid #DAE2FD",
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+          boxShadow: "0 -2px 12px #0000000d",
+          borderRadius: "16px 16px 0 0",
+          zIndex: 99,
+        }}
+      >
+        {[
+          { label: "Home", icon: "🏠" },
+          { label: "My Jobs", icon: "💼" },
+          { label: "Post Job", icon: "➕" },
+          { label: "Profile", icon: "👤" },
+        ].map((item) => (
+          <button
+            key={item.label}
+            className="nav-item"
+            onClick={() => setActiveNav(item.label)}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 3,
+              color: activeNav === item.label ? "#00236F" : "#94969E",
+              fontWeight: activeNav === item.label ? 800 : 500,
+              transform: activeNav === item.label ? "scale(1.1)" : "scale(1)",
+              fontSize: 12,
+              fontFamily: "inherit",
+            }}
+          >
+            <span style={{ fontSize: 22 }}>{item.icon}</span>
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* ── FAB ─────────────────────────────────────────────────────────────── */}
+      <button
+        className="fab"
+        style={{
+          position: "fixed",
+          bottom: 96,
+          right: 24,
+          width: 56,
+          height: 56,
+          borderRadius: "50%",
+          background: "#00236F",
+          color: "#fff",
+          border: "none",
+          fontSize: 24,
+          boxShadow: "0 8px 24px #00236f44",
+          cursor: "pointer",
+          zIndex: 98,
+        }}
+      >
+        💬
+      </button>
+
+      {/* ── JOB DETAIL MODAL ─────────────────────────────────────────────── */}
+      {selectedJob && (
+        <JobModal
+          job={selectedJob}
+          onClose={() => setSelectedJob(null)}
+          onAccept={handleAccept}
+        />
+      )}
+
+      {/* Responsive sidebar fix */}
+      <style>{`
+        @media (max-width: 768px) {
+          .main-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
