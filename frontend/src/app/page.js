@@ -1,144 +1,428 @@
-// This is your complete, full-screen responsive page.js file for HustleHub
+"use client";
+import { useState } from "react";
 
-export default function WorkerProfile() {
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0d0d;
+    font-family: 'Syne', sans-serif;
+    color: #f0ede6;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid #2a2a2a;
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+
+  .header-left .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: #c8f04a;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .header-left h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .job-id-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: #1a1a1a;
+    border: 1px solid #2e2e2e;
+    color: #888;
+    padding: 6px 14px;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── Detail Grid ── */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  @media (max-width: 560px) {
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+
+  .detail-card {
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 18px 22px;
+    transition: border-color 0.2s;
+  }
+
+  .detail-card:hover { border-color: #c8f04a44; }
+
+  .detail-card .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 6px;
+  }
+
+  .detail-card .value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f0ede6;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #c8f04a18;
+    border: 1px solid #c8f04a44;
+    color: #c8f04a;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .status-pill::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: #c8f04a;
+    border-radius: 50%;
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Section title ── */
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #444;
+    margin-bottom: 20px;
+  }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    margin-bottom: 48px;
+  }
+
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 80px;
+    position: relative;
+  }
+
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: #222;
+    z-index: 0;
+  }
+
+  .step.done:not(:last-child)::after { background: #c8f04a; }
+
+  .step-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid #2a2a2a;
+    background: #111;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.25s;
+  }
+
+  .step.done .step-dot {
+    background: #c8f04a;
+    border-color: #c8f04a;
+    color: #0d0d0d;
+    font-size: 14px;
+  }
+
+  .step.active .step-dot {
+    border-color: #c8f04a;
+    box-shadow: 0 0 0 4px #c8f04a22;
+  }
+
+  .step-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #444;
+    margin-top: 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .step.done .step-label,
+  .step.active .step-label { color: #c8f04a; }
+
+  /* ── Update Status ── */
+  .update-wrap {
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 48px;
+  }
+
+  .update-wrap .section-title { margin-bottom: 16px; }
+
+  .select-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .styled-select {
+    flex: 1;
+    min-width: 180px;
+    background: #0d0d0d;
+    border: 1px solid #2e2e2e;
+    color: #f0ede6;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  .styled-select:focus { border-color: #c8f04a; }
+
+  .save-btn {
+    background: #c8f04a;
+    color: #0d0d0d;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+
+  .save-btn:hover { background: #d9ff55; }
+  .save-btn:active { transform: scale(0.97); }
+
+  .saved-msg {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: #c8f04a;
+    margin-top: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .saved-msg.show { opacity: 1; }
+
+  /* ── Timeline ── */
+  .timeline { margin-bottom: 8px; }
+
+  .tl-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid #1c1c1c;
+    padding: 16px 0;
+    align-items: center;
+    transition: background 0.15s;
+  }
+
+  .tl-row:hover { background: #141414; }
+
+  .tl-row.tl-head {
+    border-bottom: 1px solid #2a2a2a;
+    padding: 0 0 12px;
+  }
+
+  .tl-head span {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #444;
+  }
+
+  .tl-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: #555;
+  }
+
+  .tl-status {
+    font-size: 13px;
+    font-weight: 600;
+    color: #c8f04a;
+  }
+
+  .tl-remark {
+    font-size: 13px;
+    color: #888;
+  }
+`;
+
+const STEPS = ["Pending", "Accepted", "In Progress", "Submitted", "Completed"];
+
+const TIMELINE = [
+  { date: "01/08/2026", status: "Pending",     remark: "Job posted by client" },
+  { date: "02/08/2026", status: "Accepted",    remark: "Freelancer accepted the job" },
+  { date: "03/08/2026", status: "In Progress", remark: "Work has started" },
+];
+
+export default function JobTracking() {
+  const [currentStatus, setCurrentStatus] = useState("In Progress");
+  const [selectVal, setSelectVal]         = useState("In Progress");
+  const [saved, setSaved]                 = useState(false);
+
+  const currentIdx = STEPS.indexOf(currentStatus);
+
+  function handleSave() {
+    setCurrentStatus(selectVal);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  }
+
   return (
-    /* OUTER CONTAINER: Occupies full width and height of any screen */
-    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', color: '#1e293b', fontFamily: 'sans-serif', paddingBottom: '40px', width: '100%' }}>
-      
-      {/* 1. TOP NAVIGATION BAR (Stretches fully across the top) */}
-      <header style={{ backgroundColor: 'white', padding: '15px 4%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: '0', zIndex: '100' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <span style={{ fontSize: '20px', color: '#64748b', cursor: 'pointer', fontWeight: 'bold' }}>←</span>
-          <h1 style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#1e3a8a' }}>HustleHub</h1>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <span style={{ fontSize: '20px', color: '#64748b', cursor: 'pointer' }}> Bell 🔔 </span>
-          <div style={{ width: '32px', height: '32px', backgroundColor: '#1e3a8a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
-            EP
+    <>
+      <style>{styles}</style>
+      <div className="page">
+
+        {/* Header */}
+        <header className="header">
+          <div className="header-left">
+            <p className="eyebrow">Freelance Platform</p>
+            <h1>Job Tracking<br /></h1>
+          </div>
+          <span className="job-id-badge">#J001</span>
+        </header>
+
+        {/* Detail Grid */}
+        <div className="detail-grid">
+          {[
+            { label: "Job Title",   value: "Website Development" },
+            { label: "Client",      value: "John Doe" },
+            { label: "Freelancer",  value: "Annabel" },
+          ].map(({ label, value }) => (
+            <div className="detail-card" key={label}>
+              <p className="label">{label}</p>
+              <p className="value">{value}</p>
+            </div>
+          ))}
+          <div className="detail-card">
+            <p className="label">Current Status</p>
+            <span className="status-pill">{currentStatus}</span>
           </div>
         </div>
-      </header>
 
-      {/* MAIN CONTAINER FOR THE BODY (Stretches smoothly with responsive margins) */}
-      <main style={{ width: '100%', padding: '20px 4%', boxSizing: 'border-box' }}>
-        
-        {/* 2. THE MAIN HERO PROFILE CARD */}
-        <section style={{ backgroundColor: 'white', borderRadius: '16px', padding: '25px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '20px', border: '1px solid #e2e8f0', position: 'relative', marginTop: '10px' }}>
-          
-          {/* Verified Student Badge */}
-          <div style={{ display: 'inline-block', backgroundColor: '#d1fae5', color: '#065f46', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '15px' }}>
-            ✓ Verified Student
+        {/* Progress Steps */}
+        <div className="progress-wrap">
+          <p className="section-title">Job Progress</p>
+          <div className="progress-steps">
+            {STEPS.map((step, i) => {
+              const cls = i < currentIdx ? "step done"
+                        : i === currentIdx ? "step active"
+                        : "step";
+              return (
+                <div className={cls} key={step}>
+                  <div className="step-dot">
+                    {i < currentIdx ? "✓" : i === currentIdx ? "●" : ""}
+                  </div>
+                  <span className="step-label">{step}</span>
+                </div>
+              );
+            })}
           </div>
+        </div>
 
-          {/* Profile Picture Circle */}
-          <div style={{ width: '110px', height: '110px', backgroundColor: '#bfdbfe', color: '#1e3a8a', borderRadius: '50%', margin: '0 auto 15px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.8rem', fontWeight: 'bold' }}>
-            EP
+        {/* Update Status */}
+        <div className="update-wrap">
+          <p className="section-title">Update Job Status</p>
+          <div className="select-row">
+            <select
+              className="styled-select"
+              value={selectVal}
+              onChange={e => setSelectVal(e.target.value)}
+            >
+              {[...STEPS, "Cancelled"].map(s => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+            <button className="save-btn" onClick={handleSave}>
+              Save Changes
+            </button>
           </div>
+          <p className={saved ? "saved-msg show" : "saved-msg"}>✓ Status updated successfully</p>
+        </div>
 
-          {/* Worker Name & University Title */}
-          <h2 style={{ fontSize: '1.7rem', fontWeight: 'bold', color: '#0f172a', margin: '0 0 6px 0' }}>Emade Promise</h2>
-          <p style={{ fontSize: '0.85rem', color: '#1e3a8a', margin: '0 0 20px 0', fontWeight: '700', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-            Engineering Senior @ University of Buea
-          </p>
-
-          {/* Stats Row (Rating & Trust Score) */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '25px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', marginBottom: '15px' }}>
-            <div>
-              <p style={{ margin: '0', fontSize: '1.1rem', fontWeight: 'bold', color: '#0f172a' }}>⭐ 4.9 / 5</p>
-              <p style={{ margin: '0', fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>Rating</p>
-            </div>
-            <div style={{ width: '1px', backgroundColor: '#e2e8f0' }}></div>
-            <div>
-              <p style={{ margin: '0', fontSize: '1.1rem', fontWeight: 'bold', color: '#0f172a' }}>🛡️ 98%</p>
-              <p style={{ margin: '0', fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>Trust Score</p>
-            </div>
+        {/* Timeline */}
+        <div className="timeline">
+          <p className="section-title">Timeline</p>
+          <div className="tl-row tl-head">
+            <span>Date</span><span>Status</span><span>Remarks</span>
           </div>
-          
-          {/* Completed Jobs Strip */}
-          <div style={{ backgroundColor: '#eff6ff', padding: '8px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%' }}>
-            <span style={{ color: '#1e40af', fontWeight: 'bold', fontSize: '0.9rem', margin: '0 auto' }}>✓ 50+ Jobs Completed</span>
-          </div>
-          
-        </section>
-
-
-        {/* 3. PROFESSIONAL SUMMARY SECTION */}
-        <section style={{ backgroundColor: 'white', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '12px', color: '#1e3a8a' }}>Professional Summary</h3>
-          <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6', margin: '0' }}>
-            Reliable and detail-oriented student with a passion for efficiency. I've been helping local residents and businesses through HustleHub for over a year, maintaining a near-perfect rating. Whether it's academic tutoring, home organization, or heavy lifting, I bring a professional attitude and a commitment to excellence to every task.
-          </p>
-        </section>
-
-
-        {/* 4. EXPERTISE & SKILLS SECTION (Adaptive Grid: 2 columns on mobile, up to 3 columns on wide desktop screens) */}
-        <section style={{ backgroundColor: 'white', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '15px', color: '#1e3a8a' }}>Expertise & Skills</h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-            
-            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-               <span>Tutoring</span>
+          {TIMELINE.map((row, i) => (
+            <div className="tl-row" key={i}>
+              <span className="tl-date">{row.date}</span>
+              <span className="tl-status">{row.status}</span>
+              <span className="tl-remark">{row.remark}</span>
             </div>
-            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-               <span>Cleaning</span>
-            </div>
-            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-               <span>Washing</span>
-            </div>
-            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-               <span>Shopping</span>
-            </div>
-            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-               <span>Heavy Lifting</span>
-            </div>
-            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-               <span>Tech Support</span>
-            </div>
+          ))}
+        </div>
 
-          </div>
-        </section>
-
-
-        {/* 5. RECENT REVIEWS SECTION (Stretches beautifully to fill full screen) */}
-        <section style={{ backgroundColor: 'white', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#1e3a8a', margin: '0' }}>Recent Reviews</h3>
-            <span style={{ fontSize: '0.85rem', color: '#1e40af', fontWeight: '600', cursor: 'pointer' }}>View All 48</span>
-          </div>
-
-          {/* Review Card 1 */}
-          <div style={{ border: '1px solid #f1f5f9', borderRadius: '12px', padding: '15px', backgroundColor: '#f8fafc', marginBottom: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-              <div>
-                <h4 style={{ margin: '0', fontSize: '0.95rem', fontWeight: 'bold', color: '#0f172a' }}>Sarah Jenkins</h4>
-                <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>2 days ago • Cleaning Service</p>
-              </div>
-              <span style={{ color: '#f59e0b', fontSize: '0.85rem' }}>⭐⭐⭐⭐⭐</span>
-            </div>
-            <p style={{ margin: '0', fontSize: '0.88rem', color: '#475569', lineHeight: '1.5', fontStyle: 'italic' }}>
-              "Emade was incredibly professional and efficient. She arrived on time and did a thorough job. Highly recommend for any home tasks!"
-            </p>
-          </div>
-
-          {/* Review Card 2 */}
-          <div style={{ border: '1px solid #f1f5f9', borderRadius: '12px', padding: '15px', backgroundColor: '#f8fafc' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-              <div>
-                <h4 style={{ margin: '0', fontSize: '0.95rem', fontWeight: 'bold', color: '#0f172a' }}>Michael Chen</h4>
-                <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>1 week ago • Math Tutoring</p>
-              </div>
-              <span style={{ color: '#f59e0b', fontSize: '0.85rem' }}>⭐⭐⭐⭐⭐</span>
-            </div>
-            <p style={{ margin: '0', fontSize: '0.88rem', color: '#475569', lineHeight: '1.5', fontStyle: 'italic' }}>
-              "Excellent tutor! Helped me understand difficult complex calculus topics in just two sessions. Very patient."
-            </p>
-          </div>
-
-        </section>
-
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
-
