@@ -1,10 +1,12 @@
+// This is your complete, full-screen responsive page.js file for HustleHub
 
 export default function WorkerProfile() {
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', color: '#1e293b', fontFamily: 'sans-serif', paddingBottom: '40px' }}>
+    /* OUTER CONTAINER: Occupies full width and height of any screen */
+    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', color: '#1e293b', fontFamily: 'sans-serif', paddingBottom: '40px', width: '100%' }}>
       
-      {/* 1. TOP NAVIGATION BAR */}
-      <header style={{ backgroundColor: 'white', padding: '15px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', sticky: 'top' }}>
+      {/* 1. TOP NAVIGATION BAR (Stretches fully across the top) */}
+      <header style={{ backgroundColor: 'white', padding: '15px 4%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: '0', zIndex: '100' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           <span style={{ fontSize: '20px', color: '#64748b', cursor: 'pointer', fontWeight: 'bold' }}>←</span>
           <h1 style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#1e3a8a' }}>HustleHub</h1>
@@ -12,13 +14,13 @@ export default function WorkerProfile() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <span style={{ fontSize: '20px', color: '#64748b', cursor: 'pointer' }}> Bell 🔔 </span>
           <div style={{ width: '32px', height: '32px', backgroundColor: '#1e3a8a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
-            AR
+            EP
           </div>
         </div>
       </header>
 
-      {/* MAIN CONTAINER FOR THE BODY */}
-      <main style={{ maxWidth: '480px', margin: '0 auto', padding: '15px' }}>
+      {/* MAIN CONTAINER FOR THE BODY (Stretches smoothly with responsive margins) */}
+      <main style={{ width: '100%', padding: '20px 4%', boxSizing: 'border-box' }}>
         
         {/* 2. THE MAIN HERO PROFILE CARD */}
         <section style={{ backgroundColor: 'white', borderRadius: '16px', padding: '25px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '20px', border: '1px solid #e2e8f0', position: 'relative', marginTop: '10px' }}>
@@ -30,11 +32,11 @@ export default function WorkerProfile() {
 
           {/* Profile Picture Circle */}
           <div style={{ width: '110px', height: '110px', backgroundColor: '#bfdbfe', color: '#1e3a8a', borderRadius: '50%', margin: '0 auto 15px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.8rem', fontWeight: 'bold' }}>
-            AR
+            EP
           </div>
 
           {/* Worker Name & University Title */}
-          <h2 style={{ fontSize: '1.7rem', fontWeight: 'bold', color: '#0f172a', margin: '0 0 6px 0' }}>Alex Rivera</h2>
+          <h2 style={{ fontSize: '1.7rem', fontWeight: 'bold', color: '#0f172a', margin: '0 0 6px 0' }}>Emade Promise</h2>
           <p style={{ fontSize: '0.85rem', color: '#1e3a8a', margin: '0 0 20px 0', fontWeight: '700', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
             Engineering Senior @ University of Buea
           </p>
@@ -53,7 +55,7 @@ export default function WorkerProfile() {
           </div>
           
           {/* Completed Jobs Strip */}
-          <div style={{ backgroundColor: '#eff6ff', padding: '8px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', justifyCenter: 'center', gap: '6px', width: '100%' }}>
+          <div style={{ backgroundColor: '#eff6ff', padding: '8px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%' }}>
             <span style={{ color: '#1e40af', fontWeight: 'bold', fontSize: '0.9rem', margin: '0 auto' }}>✓ 50+ Jobs Completed</span>
           </div>
           
@@ -69,41 +71,36 @@ export default function WorkerProfile() {
         </section>
 
 
-        {/* 4. EXPERTISE & SKILLS SECTION (2-Column Grid) */}
+        {/* 4. EXPERTISE & SKILLS SECTION (Adaptive Grid: 2 columns on mobile, up to 3 columns on wide desktop screens) */}
         <section style={{ backgroundColor: 'white', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '15px', color: '#1e3a8a' }}>Expertise & Skills</h3>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
             
-            {/* Row 1 */}
             <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-              📚 <span>Tutoring</span>
+               <span>Tutoring</span>
             </div>
             <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-              🧹 <span>Cleaning</span>
-            </div>
-
-            {/* Row 2 */}
-            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-              🧺 <span>Washing</span>
+               <span>Cleaning</span>
             </div>
             <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-              🛒 <span>Shopping</span>
-            </div>
-
-            {/* Row 3 */}
-            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-              💪 <span>Heavy Lifting</span>
+               <span>Washing</span>
             </div>
             <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
-              🔧 <span>Tech Support</span>
+               <span>Shopping</span>
+            </div>
+            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
+               <span>Heavy Lifting</span>
+            </div>
+            <div style={{ backgroundColor: 'white', padding: '10px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', border: '1px dashed #cbd5e1' }}>
+               <span>Tech Support</span>
             </div>
 
           </div>
         </section>
 
 
-        {/* 5. RECENT REVIEWS SECTION (New from your UI screenshot!) */}
+        {/* 5. RECENT REVIEWS SECTION (Stretches beautifully to fill full screen) */}
         <section style={{ backgroundColor: 'white', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#1e3a8a', margin: '0' }}>Recent Reviews</h3>
@@ -120,7 +117,7 @@ export default function WorkerProfile() {
               <span style={{ color: '#f59e0b', fontSize: '0.85rem' }}>⭐⭐⭐⭐⭐</span>
             </div>
             <p style={{ margin: '0', fontSize: '0.88rem', color: '#475569', lineHeight: '1.5', fontStyle: 'italic' }}>
-              "Alex was incredibly professional and efficient. He arrived on time and did a thorough job. Highly recommend for any home tasks!"
+              "Emade was incredibly professional and efficient. She arrived on time and did a thorough job. Highly recommend for any home tasks!"
             </p>
           </div>
 
@@ -144,3 +141,4 @@ export default function WorkerProfile() {
     </div>
   );
 }
+
